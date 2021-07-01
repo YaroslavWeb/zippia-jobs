@@ -1,5 +1,7 @@
 # Zippia Jobs
 
+![alt text](https://i.ibb.co/W2PQhML/Screenshot-1.png)
+
 ## Stack
 
 - React
