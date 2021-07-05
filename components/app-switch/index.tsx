@@ -1,33 +1,31 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback } from 'react'
 
 import { Switch, SwitchOption } from './styles'
 
 interface InputSwitchProps {
+  activeValue: boolean
   options: [string, string]
-  onChange: (checked: boolean) => void
+  onChange: (option: boolean) => void
 }
 
-export function AppSwitch({ options, onChange }: InputSwitchProps) {
-  const [activeValue, setActiveValue] = useState(options[0])
-
+export function AppSwitch({
+  activeValue,
+  options,
+  onChange,
+}: InputSwitchProps) {
   const handleActive = useCallback(
     (item) => () => {
-      setActiveValue(item)
+      onChange(options[0] === item)
     },
-    []
+    [onChange, activeValue]
   )
-
-  useEffect(() => {
-    onChange(activeValue === options[0])
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeValue])
 
   return (
     <Switch>
       {options.map((item, idx) => (
         <SwitchOption
           key={idx}
-          isActive={activeValue === item}
+          isActive={Boolean(idx) !== activeValue}
           onClick={handleActive(item)}
         >
           {item}

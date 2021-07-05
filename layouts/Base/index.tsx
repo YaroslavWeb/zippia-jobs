@@ -1,18 +1,22 @@
-import { ReactNode } from "react";
-import Head from "next/head";
+// Wrapper for pages. It contains a header and a footer
 
-import { LayoutHeader, LayoutContainer, LayoutFooter } from "./styles";
+import { ReactNode } from 'react'
+import Head from 'next/head'
+
+import { AppNavbar } from 'components/app-navbar'
+import { AppFooter } from 'components/app-footer'
+import { LayoutContainer } from './styles'
 
 interface MainLayoutProps {
-  children: ReactNode;
-  title: string;
-  subtitle?: string;
+  children: ReactNode
+  title: string
+  subtitle?: string
 }
 
 export function BaseLayout({
   children,
   title,
-  subtitle = "Zippia",
+  subtitle = 'Zippia',
 }: MainLayoutProps) {
   return (
     <>
@@ -24,9 +28,9 @@ export function BaseLayout({
         <meta charSet="utf-8" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <LayoutHeader>Header</LayoutHeader>
+      <AppNavbar />
       <LayoutContainer>{children}</LayoutContainer>
-      <LayoutFooter>Footer</LayoutFooter>
+      <AppFooter />
     </>
-  );
+  )
 }

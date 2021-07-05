@@ -1,20 +1,22 @@
-import { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { differenceInDays } from 'date-fns'
 
 import { IDataJobs, IJob } from 'interfaces/jobs'
 import { AppCarousel } from 'components/app-carousel'
 import { AppButton } from 'components/app-button'
 import { AppSwitch } from 'components/app-switch'
+import { InputText } from 'components/input-text'
+import { Divider } from 'styles/component'
 import {
-  Hero,
+  TopSection,
+  SearchWrapper,
   JobCard,
   JobCardTitle,
   JobCardName,
   JobCardDescription,
 } from './styles'
-
-// Variable for filter jobs by days
-const lastDays = 3
+import { getJobs } from 'services/Zippia'
+import { AnimatePresence } from 'framer-motion'
 
 interface JobsContainerProps {
   data: IDataJobs
@@ -27,74 +29,88 @@ export default function JobsContainer({ data }: JobsContainerProps) {
   // Search input value
   const [searchInput, setSearchInput] = useState<string>('')
 
+  // Error message after search. if no job exist
+  const [errorSearch, setErrorSearch] = useState<string>('')
+
   // Flag for filter Newest and all
   const [isAllJobs, setAllJobs] = useState(true)
 
-  const onSearch = useCallback(
-    (item): boolean => {
-      return item.companyName.includes(searchInput)
+  // It is activated after the work type switch. Returns filtered data by search and date
+  const handleFilter = useCallback(
+    async (checked: boolean) => {
+      setVisibleJobs([])
+      setErrorSearch('')
+      setAllJobs(checked)
+      const data = await getJobs({
+        companyName: searchInput,
+        onlyLast: !checked,
+      })
+      setVisibleJobs(data.jobs)
+      !data.jobs.length && setErrorSearch('No result')
     },
     [searchInput]
   )
 
-  const onFilter = useCallback((item): boolean => {
-    return (
-      lastDays > differenceInDays(new Date(), new Date(item.OBJpostingDate))
-    )
-  }, [])
-
-  // Searching for the jobs
-  const filterJobs = useCallback(
-    (checked = isAllJobs) => {
-      const searchableJobs = data.jobs
-        .filter((item) =>
-          checked ? onSearch(item) : onSearch(item) && onFilter(item)
-        )
-        .slice(0, 10)
-      setVisibleJobs(searchableJobs)
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isAllJobs, onFilter, onSearch]
-  )
-
-  // On switcher change
-  const onChangeFilter = useCallback(
-    (checked: boolean) => {
-      filterJobs(checked)
-      setAllJobs(checked)
-    },
-    [filterJobs]
-  )
+  // It is activated after the button search. Returns filtered data by search and date
+  const handleSearch = useCallback(async () => {
+    setVisibleJobs([])
+    setErrorSearch('')
+    const data = await getJobs({
+      companyName: searchInput,
+      onlyLast: !isAllJobs,
+    })
+    setVisibleJobs(data.jobs)
+    !data.jobs.length && setErrorSearch('No result')
+  }, [isAllJobs, searchInput])
 
   useEffect(() => {
-    setVisibleJobs(data.jobs.slice(0, 10))
+    setVisibleJobs(data.jobs)
   }, [data])
 
   return (
     <div>
-      <Hero>
-        <div>
-          <input
+      <TopSection>
+        <SearchWrapper>
+          <InputText
             value={searchInput}
             onChange={(e) => {
               setSearchInput(e.target.value)
             }}
             placeholder="Enter comapany name😘"
           />
-          <AppButton onClick={filterJobs}>Find company 🔍</AppButton>
-        </div>
-        <AppSwitch onChange={onChangeFilter} options={['All', 'Newest']} />
-      </Hero>
+          <AppButton onClick={handleSearch}>Find 🔍</AppButton>
+        </SearchWrapper>
+        <AppSwitch
+          activeValue={isAllJobs}
+          onChange={handleFilter}
+          options={['All', 'Newest']}
+        />
+      </TopSection>
+      <Divider height={64} />
       <div>
-        <AppCarousel gap={12}>
-          {visibleJobs.map((job) => (
-            <JobCard key={job.jobId}>
-              <JobCardTitle>{job.jobTitle}</JobCardTitle>
-              <JobCardName>{job.companyName}</JobCardName>
-              <JobCardDescription>{job.shortDesc}</JobCardDescription>
-            </JobCard>
-          ))}
-        </AppCarousel>
+        <AnimatePresence>
+          {errorSearch ? (
+            <span>{errorSearch}</span>
+          ) : visibleJobs.length ? (
+            <AppCarousel>
+              {visibleJobs.map((job) => (
+                <JobCard
+                  key={job.jobId}
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  exit={{ scale: 0 }}
+                >
+                  <JobCardTitle>{job.jobTitle}</JobCardTitle>
+                  <JobCardName>{job.companyName}</JobCardName>
+                  <JobCardDescription>{job.shortDesc}</JobCardDescription>
+                  <span>{job.postedDate}</span>
+                </JobCard>
+              ))}
+            </AppCarousel>
+          ) : (
+            <span>Loading...</span>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   )

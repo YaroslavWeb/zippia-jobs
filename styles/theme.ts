@@ -16,6 +16,11 @@ const theme = {
     medium: '(max-width: 720px)',
     small: '(max-width: 540px)',
   },
+
+  sizes: {
+    navbar: { height: 60 },
+    footer: { height: 180 },
+  },
 }
 
 export default theme

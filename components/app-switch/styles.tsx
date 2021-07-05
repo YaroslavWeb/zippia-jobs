@@ -5,7 +5,8 @@ import theme from 'styles/theme'
 export const Switch = styled.span`
   display: flex;
   width: fit-content;
-  font-size: 16px;
+  height: 48px;
+  font-size: 18px;
   line-height: 24px;
   border-radius: 8px;
   background: ${theme.colors.white};

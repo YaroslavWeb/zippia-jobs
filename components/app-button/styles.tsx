@@ -1,13 +1,13 @@
-import { darken } from "polished";
-import styled from "styled-components";
+import { darken } from 'polished'
+import styled from 'styled-components'
 
-import theme from "styles/theme";
+import theme from 'styles/theme'
 
 export const StyledButton = styled.button`
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 32px;
+  height: 48px;
   position: relative;
   white-space: nowrap;
   outline: transparent solid 2px;
@@ -16,7 +16,7 @@ export const StyledButton = styled.button`
   font-size: 14px;
   color: ${theme.colors.white};
   background: ${theme.colors.primary};
-  border-radius: 6px;
+  border-radius: 0 8px 8px 0;
   border: 1px solid ${theme.colors.primary};
   cursor: pointer;
   user-select: none;
@@ -30,4 +30,4 @@ export const StyledButton = styled.button`
   &:active {
     background: ${darken(0.1, theme.colors.primary)};
   }
-`;
+`
